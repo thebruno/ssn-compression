@@ -5,7 +5,7 @@ using System.Text;
 using System.Drawing;
 using System.Collections;
 
-namespace SSNCompressor
+namespace SSNUtilities
 {
     class BitmapEx
     {
@@ -57,59 +57,7 @@ namespace SSNCompressor
 
 
     }
-    public delegate double Function(double val);
-
-    class Connection
-    {
-        public Neuron N{get; set;}
-        public double Weight{get; set;}
-        Connection(Neuron n, double weight)
-        {
-            N = n;
-            Weight = weight;
-        }
-    }
-
-    class Neuron
-    {
-        public Function ActivationFunction { get; set; }
-        public List<Connection> Inputs { get; set; }        
-        public double Error { get; set; }
-        public double Output { get; set; }
-
-        double Constant { get; set; }
-        Random Rand = new Random (DateTime.Now.Millisecond);
-
-        Neuron(double constantVal, Function func)
-        {
-            ActivationFunction = func;
-            Inputs = new List<Connection>();
-            Error = 0.0;
-            Output = 0.0;
-        }
-        double Count()
-        {
-            Output = 0;
-            foreach (Connection c in Inputs)
-                Output += c.N.Output * c.Weight;
-            Output += Constant;
-            Output = ActivationFunction(Output);
-            return Output;
-        }
-        public void Randomise(double Min, double Max)
-        {            
-            foreach (Connection c in Inputs)
-            {
-                c.Weight = (Rand.NextDouble() * (Max - Min)) + Min;
-            }
-            Constant = (Rand.NextDouble() * (Max - Min)) + Min;
-        }
-    }
-    class Layer
-    { }
-
-    class Network
-    { }
+    
 
     public class SSNCompression
     {
