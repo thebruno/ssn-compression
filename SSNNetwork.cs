@@ -1,126 +1,102 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
 
 namespace SSNNetwork
 {
-    public delegate double Function(double val);
-
-
-    //TODO: add error checking
-    public class SSNConnection
-    {
-        public SSNNeuron N { get; set; }
-        public double Weight { get; set; }
-        public SSNConnection(SSNNeuron n, double weight)
-        {
-            N = n;
-            Weight = weight;
-        }
-    }
-
     public class SSNNeuron
     {
-        public Function ActivationFunction { get; set; }
-        public List<SSNConnection> Inputs { get; set; }
-        public double Error { get; set; }
-        public double Output { get; set; }
-
-        double Constant { get; set; }
-        Random Rand = new Random(DateTime.Now.Millisecond);
-
-        public SSNNeuron( Function activation)
+        double Min = 0;
+        double Max = 255;
+        int[] inputs;
+        public double[] weights;
+        int matrixSize;
+        Size matrix;
+        public void SetInputs(int[] newInputs)
         {
-            ActivationFunction = activation;
-            Inputs = new List<SSNConnection>();
-            Error = 0.0;
-            Output = 0.0;
-            Constant = 0.0;
-        }
-        #region public Methods
-        public void Randomise(double Min, double Max)
-        {
-            foreach (SSNConnection c in Inputs)
-            {
-                c.Weight = (Rand.NextDouble() * (Max - Min)) + Min;
-            }
-            Constant = (Rand.NextDouble() * (Max - Min)) + Min;
+            inputs = newInputs;
         }
 
-        public void AddInput(SSNNeuron n, double weight)
-        {
-            Inputs.Add(new SSNConnection(n, weight));
+        public double Error() {
+            double temp = 0.0;
+            for (int i = 0; i < matrixSize; i++)
+                temp += Math.Abs(inputs[i] - weights[i]);
+            temp /= (double) matrixSize;
+            return temp;
         }
-        public void AddInputs(SSNLayer layer, double weight)
+        
+        public SSNNeuron(Size m, Random r)
         {
-            foreach (SSNNeuron n in layer.Neurons)
-                AddInput(n, weight);
+            matrix = m;
+            matrixSize = matrix.Width * matrix.Height;
+            inputs = new int[matrixSize];
+            weights = new double[matrixSize];
+            for (int i = 0; i < matrixSize; i++)
+                weights[i] = 128;//(r.NextDouble() * (Max - Min)) + Min;
         }
-        public void AddInput(SSNNeuron n)
+        public void Improve(double factor)
         {
-            AddInput(n, 1.0);
-        }
-        public void AddInputs(SSNLayer layer)
-        {
-            AddInputs(layer, 1.0);
-        }
-
-        double Count()
-        {
-            Output = 0;
-            foreach (SSNConnection c in Inputs)
-                Output += c.N.Output * c.Weight;
-            Output += Constant * 1.0;
-            Output = ActivationFunction(Output);
-            return Output;
+            for (int i = 0; i < matrixSize; i++)
+                weights[i] += factor * (inputs[i] - weights[i]);
         }
 
-        public double CountError(double correctVal)
-        {
-            Error = correctVal - Output;
-            return Error;
-        }
-
-        public void Learn(double factor)
-        {
-            foreach (SSNConnection c in Inputs)
-            {
-                //TODO:
-                //c.Weight += factor * Error * LeariningFunction(Output) * c.N.Output;
-            }
-            //TODO:
-            //Constant += factor * Error * LeariningFunction(Output) * 1.0;
-        }
-        #endregion
     }
-
 
     public class SSNLayer
     {
-        public List<SSNNeuron> Neurons { get; set; }
-        public SSNLayer(int count, Function activation)
+        public ArrayList neurons;
+        int matrixSize;
+        int neuronCount;
+        Size matrix;
+
+        Random random = new Random((int)DateTime.Now.Millisecond);
+        public SSNLayer(int count, Size m)
         {
-            Neurons = new List<SSNNeuron>();
-            for (int i = 0; i < count; ++i)
-                Neurons.Add(new SSNNeuron(activation));
-        }
-        public void ConnectToLayer(SSNLayer previousLayer)
-        {
-            foreach (SSNNeuron n in Neurons)
-            {
-                n.AddInputs(previousLayer);
-            }
-        }
-        public void RandomiseAllNeurons(double min, double max){
-            foreach (SSNNeuron n in Neurons)
-            {
-                n.Randomise(min, max);
-            }
+            matrix = m;
+            neuronCount = count;
+            matrixSize = matrix.Width * matrix.Height;
+            neurons = new ArrayList(matrixSize);
+
+            for (int i = 0; i < neuronCount; i++)
+                neurons.Add(new SSNNeuron(matrix, random));
         }
 
+        public void Learn(double factor, int[] inputs)
+        {
+            int winner = GetWinnerForInputs(inputs);
+            (neurons[winner] as SSNNeuron).Improve(factor);
+            //for (int i = 0; i < 10; i++) {
+            //    int temp = random.Next(255);
+            //    (neurons[temp] as SSNNeuron).SetInputs(inputs);
+            //    (neurons[temp] as SSNNeuron).Improve(factor/10.0); 
+            //}
+        }
+        public int GetWinnerForInputs(int[] inputs)
+        {
+            int pos = 0;
+            double min = double.MaxValue;
+            for (int i = 0; i < neuronCount; i++)
+            {
+                SSNNeuron n = neurons[i] as SSNNeuron;
+                n.SetInputs(inputs);
+                if (min > n.Error())
+                {
+                    pos = i;
+                    min = n.Error();
+                }
+            }
+            return pos;
+        }
+        // get weights for particular neuron
+        public double[] GetWeights(int neuron)
+        {
+            return (neurons[neuron] as SSNNeuron).weights;
+        }
+        
     }
 
-    public class SSNNetwork
-    { }
+
 }

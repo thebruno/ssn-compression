@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using SSNUtilities;
 
-namespace SSNCompressor
+namespace SSNCompression
 {
     public partial class Main : Form
     {
@@ -23,16 +23,29 @@ namespace SSNCompressor
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                path = openFileDialog1.FileName;
-                BitmapEx bitmap = new BitmapEx(path, true);
-                pictureBox1.Image = bitmap.GetBitmap;
-
-                int [] pixels = bitmap.GetPixels;
-                Bitmap b = new BitmapEx(pixels, bitmap.GetSize).GetBitmap;
-
-
+                if (!checkBox1.Checked)
+                {
+                    path = openFileDialog1.FileName;
+                    BitmapEx bitmap = new BitmapEx(path, new Size(16, 16),  true);
+                    pictureBox1.Image = bitmap.GetBitmap;
+                } 
+                else
+                    path = openFileDialog1.FileName;
             }
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                SSNCompress compress = new SSNCompress(512, new Size(8, 8));
+                if (!checkBox1.Checked)
+                    compress.Compress(path, saveFileDialog1.FileName);
+                else
+                    compress.DeCompress(path, saveFileDialog1.FileName);
+
+            }            
         }
     }
 }
