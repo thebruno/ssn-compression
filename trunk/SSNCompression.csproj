@@ -8,7 +8,7 @@
     <ProjectGuid>{6BEECC09-6E06-46C8-8230-E6BD68464242}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SSNCompressor</RootNamespace>
+    <RootNamespace>SSNCompression</RootNamespace>
     <AssemblyName>SSNCompressor</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SSNCompression.cs" />
     <Compile Include="SSNNetwork.cs" />
     <Compile Include="SSNUitl.cs" />
     <Compile Include="Main.cs">
@@ -69,6 +70,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
