@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace SSNNetwork
 {
-    public class SSNNeuron
+    public class SSNNeuron:IComparable
     {
         double Min = 0;
         double Max = 255;
@@ -15,6 +15,7 @@ namespace SSNNetwork
         public double[] weights;
         int matrixSize;
         Size matrix;
+
         public void SetInputs(int[] newInputs)
         {
             inputs = newInputs;
@@ -35,14 +36,23 @@ namespace SSNNetwork
             inputs = new int[matrixSize];
             weights = new double[matrixSize];
             for (int i = 0; i < matrixSize; i++)
-                weights[i] = 128;//(r.NextDouble() * (Max - Min)) + Min;
+                weights[i] = (r.NextDouble() * (Max - Min)) + Min;
         }
+
         public void Improve(double factor)
         {
             for (int i = 0; i < matrixSize; i++)
                 weights[i] += factor * (inputs[i] - weights[i]);
         }
 
+        public int CompareTo(object obj)
+        {
+            if (this.Error() - (obj as SSNNeuron).Error() < 0)
+                return -1;
+            if (this.Error() - (obj as SSNNeuron).Error() == 0)
+                return 0;
+            return 1;
+        }
     }
 
     public class SSNLayer
@@ -66,13 +76,26 @@ namespace SSNNetwork
 
         public void Learn(double factor, int[] inputs)
         {
-            int winner = GetWinnerForInputs(inputs);
-            (neurons[winner] as SSNNeuron).Improve(factor);
+            this.SetInput(inputs);
+            neurons.Sort();
+            for (int i = 0; i < neuronCount; i++)
+            {
+                (neurons[i] as SSNNeuron).Improve(factor * Math.Exp(((double)-i) / 25.0));
+                
+            }
+            //int winner = GetWinnerForInputs(inputs);
+            //(neurons[winner] as SSNNeuron).Improve(factor / ); 
             //for (int i = 0; i < 10; i++) {
             //    int temp = random.Next(255);
-            //    (neurons[temp] as SSNNeuron).SetInputs(inputs);
+            //    
             //    (neurons[temp] as SSNNeuron).Improve(factor/10.0); 
             //}
+        }
+
+        private void SetInput(int[] inputs)
+        {
+            foreach (SSNNeuron n in neurons)
+                n.SetInputs(inputs);
         }
         public int GetWinnerForInputs(int[] inputs)
         {

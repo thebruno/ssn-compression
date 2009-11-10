@@ -26,7 +26,7 @@ namespace SSNCompression
                 if (!checkBox1.Checked)
                 {
                     path = openFileDialog1.FileName;
-                    BitmapEx bitmap = new BitmapEx(path, new Size(16, 16),  true);
+                    BitmapEx bitmap = new BitmapEx(path, new Size(4, 4),  true);
                     pictureBox1.Image = bitmap.GetBitmap;
                 } 
                 else
@@ -39,13 +39,25 @@ namespace SSNCompression
         {
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                SSNCompress compress = new SSNCompress(512, new Size(8, 8));
+                SSNCompress compress = new SSNCompress(256, new Size(2, 2));
                 if (!checkBox1.Checked)
                     compress.Compress(path, saveFileDialog1.FileName);
                 else
                     compress.DeCompress(path, saveFileDialog1.FileName);
 
             }            
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            string p1 = @"d:\Programming\PolSl\ssn\SSNCompressor\64x64x8";
+            string p2 = @"d:\Programming\PolSl\ssn\SSNCompressor\1024x768x8";
+            string p = p2;
+            SSNCompress compress = new SSNCompress(256, new Size(4, 4));
+            compress.Compress(p+ ".bmp", p+".bin");
+            compress.DeCompress(p +".bin", p +"_org.bmp");
+            BitmapEx bitmap = new BitmapEx(p + "_org.bmp", new Size(4, 4), true);
+            pictureBox1.Image = bitmap.GetBitmap;
         }
     }
 }
