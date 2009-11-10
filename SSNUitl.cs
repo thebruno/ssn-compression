@@ -17,7 +17,6 @@ namespace SSNUtilities
         public Bitmap GetBitmap { get { return bitmap; } }
         public Size GetSize { get { return new Size(bitmap.Width, bitmap.Height); } }
 
-
         private Bitmap ToBitmap(int[] p, Size s)
         {
             Bitmap toReturn = new Bitmap(s.Width, s.Height);
@@ -33,6 +32,7 @@ namespace SSNUtilities
                 }
             return toReturn;
         }
+
         private int[] ToPixels(Bitmap b)
         {
             int[] toReturn = new Int32[b.Width * b.Height];
@@ -48,6 +48,7 @@ namespace SSNUtilities
             bitmap = b;
             pixels = ToPixels(b);
         }
+
         public BitmapEx(Size s,Size matrixVal)
         {
             matrix = matrixVal;
@@ -76,8 +77,6 @@ namespace SSNUtilities
             matrix = s;
         }
 
-        #region IEnumerable Members
-
         public IEnumerator GetEnumerator()
         {
             for (int i = 0; i < bitmap.Height ; i += matrix.Height)
@@ -98,7 +97,5 @@ namespace SSNUtilities
                 }
             }
         }
-
-        #endregion
     }
 }

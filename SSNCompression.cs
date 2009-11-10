@@ -28,8 +28,8 @@ namespace SSNCompression
         double Factor
         {
             get { 
-              //return factor * Math.Exp(((double) -step++) /10.0); 
-                return factor * (-Math.Exp(((double)step++) / 15.0) + 2); 
+              return factor * Math.Exp(((double) -step++) /10.0); 
+                //return factor * (-Math.Exp(((double)step++) / 15.0) + 2); 
             }
             set { step = 0;
                 factor = value;
@@ -46,15 +46,15 @@ namespace SSNCompression
                                    
 
             // learn
-            Factor = 1;
-            double f  = 1;
+            Factor = 0.9;
+            double f  ;
             for (int i = 0; i < 10; i++)
-            {
-                f -= 1 / 10;
+            {}
+                f = Factor;
                 foreach (int[] temp in bitmap)
-                    layer.Learn(f, temp);
-                
-            }
+                    layer.Learn(1.0, temp);
+
+            
             // save 
             // wymiary obrazka intxint
             // ilosc neuronow int
@@ -118,7 +118,8 @@ namespace SSNCompression
                         {
                             unchecked
                             {
-                                temp = (int)0xff000000 | (byte)weights[k * matrix.Width + w] << 16 | (byte)weights[k * matrix.Width + w] << 8 | (byte)weights[k * matrix.Width + w];
+                                int val = (int)Math.Round(weights[k * matrix.Width + w]);
+                                temp = (int)0xff000000 | val << 16 | val << 8 | val;
                                 pixels[(i + k) * bitmapSize.Width + j + w] = temp; 
                             }
                         }
@@ -131,7 +132,6 @@ namespace SSNCompression
             // utworz bitmape
             // numer neuronu wskazuje przyblizany fragment bitmapy
             
-
             bitmap.GetBitmap.Save(pathOut, System.Drawing.Imaging.ImageFormat.Bmp);
             binReader.Close();
         }
